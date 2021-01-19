@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--整合Mybatis的过程-->
+    <!--1.配置数据库相关参数properties的属性-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!--2.配置数据源/数据库连接池-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="maxPoolSize" value="30"/>
+        <property name="minPoolSize" value="10"/>
+        <property name="autoCommitOnClose" value="false"/>
+        <property name="checkoutTimeout" value="10000"/>
+        <property name="acquireRetryAttempts" value="2"/>
+     </bean>
+
+    <!--3.sqlSessionFactory的配置-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--注入数据源/数据库连接池-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--说明Mybatis全局配置文件：mybatis-config.xml的位置-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!--在映射文件调用实体类的时候可用使用别名-->
+        <property name="typeAliasesPackage" value="com.deng.o2o.entity"/>
+        <!--说明映射文件的位置-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+     </bean>
+
+    <!--4.配置映射器接口-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="com.deng.o2o.dao"/>
+    </bean>
+
+
+</beans>
